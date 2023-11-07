@@ -1,6 +1,12 @@
-﻿Dictionary<string, List<int>> bandasRegistradas = new Dictionary<string, List<int>>();
-bandasRegistradas.Add("Linkin Park", new List<int> { 10, 8, 6 });
-bandasRegistradas.Add("The Beatles", new List<int>());
+﻿using ScreenSound.Modelos;
+
+Dictionary<string, Artista> bandasRegistradas = new();
+
+Artista Ira = new("Ira!");
+Artista Leozin = new("Leozin");
+
+bandasRegistradas.Add("Ira", Ira);
+bandasRegistradas.Add("Leozin", Leozin);
 
 void ExibirLogo()
 {
@@ -15,9 +21,43 @@ void ExibirLogo()
 ");
     Console.WriteLine("Boas vindas ao Screen Sound 2.0!");
 }
+void ExibirTituloDaOpcao(string titulo)
+{
+    int quantidadeDeLetras = titulo.Length;
+    string asteriscos = string.Empty.PadLeft(quantidadeDeLetras, '*');
+    Console.WriteLine(asteriscos);
+    Console.WriteLine(titulo);
+    Console.WriteLine(asteriscos + "\n");
+}
+bool BandaExiste(string banda, Action opcaoDoMenu)
+{
+    int voltar;
 
+    if (bandasRegistradas.ContainsKey(banda))
+    {
+        return true;
+    }
+    else
+    {
+        Console.WriteLine($"\n!!!A banda {banda} não Existe!!! \n\nPara tentar novamente pressione 1 \n\nPara voltar ao menu principal presione 2");
+        voltar = int.Parse(Console.ReadLine()!);
+        switch (voltar)
+        {
+            case 1: opcaoDoMenu(); break;
+            case 2: ExibirOpcoesDoMenu(); break;
+        }
+        return false;
+    }
+}
+void VoltarAoMenu()
+{
+    Console.WriteLine("\nAperte Qualquer tecla para voltar");
+    Console.ReadKey();
+    ExibirOpcoesDoMenu();
+}
 void ExibirOpcoesDoMenu()
 {
+    Console.Clear();
     ExibirLogo();
     Console.WriteLine("\nDigite 1 para registrar uma banda");
     Console.WriteLine("Digite 2 para registrar o álbum de uma banda");
@@ -55,37 +95,40 @@ void ExibirOpcoesDoMenu()
             break;
     }
 }
-
-void RegistrarAlbum()
-{
-    Console.Clear();
-    ExibirTituloDaOpcao("Registro de álbuns");
-    Console.Write("Digite a banda cujo álbum deseja registrar: ");
-    string nomeDaBanda = Console.ReadLine()!;
-    Console.Write("Agora digite o título do álbum: ");
-    string tituloAlbum = Console.ReadLine()!;
-    /**
-     * ESPAÇO RESERVADO PARA COMPLETAR A FUNÇÃO
-     */
-    Console.WriteLine($"O álbum {tituloAlbum} de {nomeDaBanda} foi registrado com sucesso!");
-    Thread.Sleep(4000);
-    Console.Clear();
-    ExibirOpcoesDoMenu();
-}
-
 void RegistrarBanda()
 {
     Console.Clear();
     ExibirTituloDaOpcao("Registro das bandas");
     Console.Write("Digite o nome da banda que deseja registrar: ");
-    string nomeDaBanda = Console.ReadLine()!;
-    bandasRegistradas.Add(nomeDaBanda, new List<int>());
-    Console.WriteLine($"A banda {nomeDaBanda} foi registrada com sucesso!");
-    Thread.Sleep(4000);
-    Console.Clear();
-    ExibirOpcoesDoMenu();
+    string nomeDoArtista = Console.ReadLine()!;
+    Artista artista = new Artista(nomeDoArtista);
+    bandasRegistradas.Add(nomeDoArtista, artista);
+    Console.WriteLine($"A banda {nomeDoArtista} foi registrada com sucesso!");
+    VoltarAoMenu();
 }
+void RegistrarAlbum()
+{
+    Console.Clear();
+    ExibirTituloDaOpcao("Registro de álbuns");
+    Console.Write("Digite a banda cujo álbum deseja registrar: ");
+    string nomeDoArtista = Console.ReadLine()!;
+    if(BandaExiste(nomeDoArtista, RegistrarAlbum))
+    {
 
+    Artista artista = bandasRegistradas[nomeDoArtista];
+
+    Console.Write("Agora digite o título do álbum: ");
+    string tituloAlbum = Console.ReadLine()!;
+
+    Album AlbumNovo = new(tituloAlbum);
+    artista.AdicionarAlbum(AlbumNovo);
+    
+    Console.WriteLine($"O álbum {tituloAlbum} de {nomeDoArtista} foi registrado com sucesso!");
+
+    }
+
+    VoltarAoMenu();
+}
 void MostrarBandasRegistradas()
 {
     Console.Clear();
@@ -95,76 +138,36 @@ void MostrarBandasRegistradas()
     {
         Console.WriteLine($"Banda: {banda}");
     }
-
-    Console.WriteLine("\nDigite uma tecla para voltar ao menu principal");
-    Console.ReadKey();
-    Console.Clear();
-    ExibirOpcoesDoMenu();
-
+    VoltarAoMenu();
 }
-
-void ExibirTituloDaOpcao(string titulo)
-{
-    int quantidadeDeLetras = titulo.Length;
-    string asteriscos = string.Empty.PadLeft(quantidadeDeLetras, '*');
-    Console.WriteLine(asteriscos);
-    Console.WriteLine(titulo);
-    Console.WriteLine(asteriscos + "\n");
-}
-
 void AvaliarUmaBanda()
 {
     Console.Clear();
     ExibirTituloDaOpcao("Avaliar banda");
     Console.Write("Digite o nome da banda que deseja avaliar: ");
-    string nomeDaBanda = Console.ReadLine()!;
-    if (bandasRegistradas.ContainsKey(nomeDaBanda))
+    string nomeDoArtista = Console.ReadLine()!;
+    if (BandaExiste(nomeDoArtista, AvaliarUmaBanda))
     {
-        Console.Write($"Qual a nota que a banda {nomeDaBanda} merece: ");
-        int nota = int.Parse(Console.ReadLine()!);
-        bandasRegistradas[nomeDaBanda].Add(nota);
-        Console.WriteLine($"\nA nota {nota} foi registrada com sucesso para a banda {nomeDaBanda}");
-        Thread.Sleep(2000);
-        Console.Clear();
-        ExibirOpcoesDoMenu();
+        Console.Write($"Qual a nota que a banda {nomeDoArtista} merece: ");
+        Avaliacao nota = Avaliacao.Parse(Console.ReadLine()!);
+        bandasRegistradas[nomeDoArtista].AdicionarNota(nota);
+        Console.WriteLine($"\nA nota {nota.Nota} foi registrada com sucesso para a banda {nomeDoArtista}");
+        VoltarAoMenu();   
     }
-    else
-    {
-        Console.WriteLine($"\nA banda {nomeDaBanda} não foi encontrada!");
-        Console.WriteLine("Digite uma tecla para voltar ao menu principal");
-        Console.ReadKey();
-        Console.Clear();
-        ExibirOpcoesDoMenu();
-    }
-
 }
-
 void ExibirDetalhes()
 {
     Console.Clear();
     ExibirTituloDaOpcao("Exibir detalhes da banda");
     Console.Write("Digite o nome da banda que deseja conhecer melhor: ");
-    string nomeDaBanda = Console.ReadLine()!;
-    if (bandasRegistradas.ContainsKey(nomeDaBanda))
+    string NomeDoArtista = Console.ReadLine()!;
+    if (BandaExiste(NomeDoArtista, ExibirDetalhes))
     {
-        List<int> notasDaBanda = bandasRegistradas[nomeDaBanda];
-        Console.WriteLine($"\nA média da banda {nomeDaBanda} é {notasDaBanda.Average()}.");
-        /**
-        * ESPAÇO RESERVADO PARA COMPLETAR A FUNÇÃO
-        */
-        Console.WriteLine("Digite uma tecla para votar ao menu principal");
-        Console.ReadKey();
-        Console.Clear();
-        ExibirOpcoesDoMenu();
+        Artista artista = bandasRegistradas[NomeDoArtista]; 
+        Console.WriteLine($"\nA média da banda {artista.Nome} é {artista.Media}.");
+        artista.ExibirDiscografia();
+        VoltarAoMenu();
 
-    }
-    else
-    {
-        Console.WriteLine($"\nA banda {nomeDaBanda} não foi encontrada!");
-        Console.WriteLine("Digite uma tecla para voltar ao menu principal");
-        Console.ReadKey();
-        Console.Clear();
-        ExibirOpcoesDoMenu();
     }
 }
 
