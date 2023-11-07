@@ -2,13 +2,16 @@
 internal class Album
 {
     private List<Musica> musicas = new List<Musica>();
-
+    private static int contador = 0;
     public Album(string nome)
     {
         Nome = nome;
+        Ordem = contador;
+        contador++;
     }
 
     public string Nome { get; }
+    public int Ordem { get; }
     public int DuracaoTotal => musicas.Sum(m => m.Duracao);
     public List<Musica> Musicas => musicas;
 
