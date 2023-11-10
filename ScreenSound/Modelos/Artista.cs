@@ -1,12 +1,12 @@
-﻿using ScreenSound.Modelos;
+﻿using ScreenSound.Menus;
 namespace ScreenSound.Modelos;
-internal class Artista
+internal class Artista : IAvaliavel
 {
     private List<Album> albuns = new();
     private List<Avaliacao> notas = new();
 
     public Artista(string nome)
-    {
+    {   
         Nome = nome; 
     }
 
@@ -18,8 +18,8 @@ internal class Artista
             else return notas.Average(a => a.Nota);
         }
     }
-    public List<Album> Albuns => albuns;
-
+    
+    public IEnumerable<Album> Albuns => albuns;
     public void AdicionarAlbum(Album album) 
     { 
         albuns.Add(album);
@@ -35,7 +35,7 @@ internal class Artista
         Console.WriteLine($"Discografia da banda {Nome}");
         foreach (Album album in albuns)
         {
-            Console.WriteLine($"Álbum: {album.Nome} ({album.DuracaoTotal})");
+            Console.WriteLine($"Álbum: {album.Nome} Nota: {album.Media} ({album.DuracaoTotal})");
         }
     }
 }
